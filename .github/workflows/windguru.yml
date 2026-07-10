@@ -1,0 +1,39 @@
+# Place this file at: .github/workflows/windguru.yml
+name: ZENTRA to WindGuru bridge
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes (UTC; GitHub may delay a few min)
+  workflow_dispatch:          # allows manual "Run workflow" button for testing
+
+permissions:
+  contents: write             # needed by the keepalive step
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run bridge
+        env:
+          ZENTRA_TOKEN: ${{ secrets.ZENTRA_TOKEN }}
+          ZENTRA_DEVICE_SN: ${{ secrets.ZENTRA_DEVICE_SN }}
+          WINDGURU_UID: ${{ secrets.WINDGURU_UID }}
+          WINDGURU_PASSWORD: ${{ secrets.WINDGURU_PASSWORD }}
+          STATION_ELEVATION_M: ${{ secrets.STATION_ELEVATION_M }}
+        run: python windguru_bridge.py
+
+      # Prevents GitHub from auto-disabling the schedule after 60 days
+      # of repository inactivity (it makes a tiny dummy commit when needed).
+      - name: Keepalive
+        uses: gautamkrishnar/keepalive-workflow@v2
