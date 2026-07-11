@@ -1,0 +1,25 @@
+name: ZENTRA to WindGuru bridge (batch)
+
+on:
+  schedule:
+    - cron: "3,18,33,48 * * * *"
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        run: git clone --depth 1 "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" repo
+
+      - name: Install dependencies
+        run: python3 -m pip install --user --quiet requests
+
+      - name: Run batch bridge
+        env:
+          ZENTRA_TOKEN: ${{ secrets.ZENTRA_TOKEN }}
+          ZENTRA_DEVICE_SN: ${{ secrets.ZENTRA_DEVICE_SN }}
+          WINDGURU_UID: ${{ secrets.WINDGURU_UID }}
+          WINDGURU_PASSWORD: ${{ secrets.WINDGURU_PASSWORD }}
+          STATION_ELEVATION_M: ${{ secrets.STATION_ELEVATION_M }}
+        run: python3 repo/windguru_bridge_batch.py
