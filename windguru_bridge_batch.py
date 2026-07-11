@@ -91,13 +91,13 @@ def station_to_sea_level_hpa(p_hpa, elevation_m, temp_c):
 # ------------------------------------------------------------------ ZENTRA pull
 def fetch_all_readings(token, device_sn):
     """Return {measurement_name: {unix_ts: (value, units)}} for the last 2 h."""
-    start = datetime.now(timezone.utc) - timedelta(hours=2)
+    start = datetime.now(timezone.utc) - timedelta(hours=12)
     params = {
         "device_sn": device_sn,
         "start_date": start.strftime("%Y-%m-%d %H:%M"),
         "output_format": "json",
         "sort_by": "descending",
-        "per_page": 2000,
+        "per_page": 1000,
         "page_num": 1,
     }
     headers = {"Authorization": f"Token {token}"}
@@ -106,7 +106,11 @@ def fetch_all_readings(token, device_sn):
         print("ZENTRA rate limit hit; will succeed on next scheduled run.")
         sys.exit(0)
     r.raise_for_status()
-    data = r.json().get("data", {})
+    payload = r.json()
+    pag = payload.get("pagination", {})
+    if pag:
+        print("ZENTRA pagination:", {k: pag.get(k) for k in list(pag)[:8]})
+    data = payload.get("data", {})
 
     series = {}
     for measurement, sensors in data.items():
@@ -161,6 +165,20 @@ def main():
     rh = find_series(series, "relative", "humidity") or find_series(series, "rh")
     pres = find_series(series, "atmospheric", "pressure") or find_series(series, "barometric")
     precip = find_series(series, "precipitation") or find_series(series, "rain")
+
+    def describe(label, bucket):
+        if not bucket:
+            print(f"  {label}: 0 readings")
+            return
+        lo, hi = min(bucket), max(bucket)
+        fmt = lambda t: datetime.fromtimestamp(t, timezone.utc).strftime("%d %H:%M")
+        print(f"  {label}: {len(bucket)} readings, {fmt(lo)} -> {fmt(hi)} UTC")
+
+    print("Series returned by ZENTRA (last 12 h requested):")
+    describe("wind speed", wind)
+    describe("gust", gust)
+    describe("air temp", temp)
+    describe("pressure", pres)
 
     now = int(time.time())
     timestamps = sorted(
