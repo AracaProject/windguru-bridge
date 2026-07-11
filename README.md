@@ -5,7 +5,7 @@ weather station to [WindGuru](https://stations.windguru.cz/), every 15 minutes,
 with zero infrastructure.
 
 <!-- Once you know your WindGuru station number, link it here: -->
-**Live data:** https://www.windguru.cz/station/XXXX
+**Live data:** https://www.windguru.cz/station/16371
 
 ## What it does
 
