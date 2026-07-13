@@ -1,7 +1,7 @@
 # Weather Station → WindGuru: System Documentation & Handover
 
 **System:** Automatic publication of Araca weather station data to WindGuru
-**Built:** July 2026, by [NAME], with technical assistance from Claude (Anthropic's AI assistant), which designed the architecture and wrote the code
+**Built:** July 2026, by Yan Hess, with technical assistance from Claude (Anthropic's AI assistant), which designed the architecture and wrote the code
 **Status:** In production since 11 July 2026
 **Audience:** Anyone who needs to understand, maintain, fix, or shut down this system without prior context.
 
@@ -23,9 +23,9 @@ at Araca is involved.
 | Component | What it is | Account/where |
 |---|---|---|
 | Weather station | ZL6 logger + ATMOS 41, measures every 15 min | Physical, at the reserve |
-| ZENTRA Cloud | Receives the station's data (US server) | zentracloud.com — [account holder] |
+| ZENTRA Cloud | Receives the station's data (US server) | zentracloud.com — araca.project.br(at)gmail.com |
 | GitHub repository | Holds the code and runs it on demand | github.com/AracaProject/windguru-bridge |
-| cron-job.org | Free scheduler; tells GitHub to run the code every hour | console.cron-job.org — [account holder] |
+| cron-job.org | Free scheduler; tells GitHub to run the code every hour | console.cron-job.org — y.hess(at)antonelli-foundations.org |
 | WindGuru station | Public page showing the data | stations.windguru.cz, station "RPPN Alto..." (UID stored as a GitHub secret) |
 
 ## 3. How data flows
@@ -117,5 +117,5 @@ station-tuned forecast (the project's goal for the 120 ha reserve);
 GitHub Actions chosen for zero cost; batch upload + external hourly
 scheduler adopted after GitHub's native 15-minute schedule proved
 unreliable on this account. The AI assistant Claude designed the
-architecture, wrote all code, and diagnosed the deployment issues; [NAME]
+architecture, wrote all code, and diagnosed the deployment issues; Yan Hess
 executed all account setup, reviewed changes, and holds all credentials.
